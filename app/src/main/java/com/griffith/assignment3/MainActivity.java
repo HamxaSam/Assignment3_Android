@@ -46,10 +46,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onLocationChanged(Location location) {
                         Log.d("GPS", location.toString());
                         locationDBOpenHelper.addLocation(sqLiteDatabase, location);
-                        ArrayList<CustomLocation> cl = locationDBOpenHelper.getAllLocations(sqLiteDatabase);
-                        for (CustomLocation c : cl){
-                            Log.d("GPS", c.toString());
-                        }
+                        Log.d("GPS", "Distance totale : " + locationDBOpenHelper.getTotal_distance());
+                        Log.d("GPS", "Vitesse moyenne : " + locationDBOpenHelper.getAvgSpeed(sqLiteDatabase));
+                        Log.d("GPS", "Vitesse instantannée : " + locationDBOpenHelper.getCurrentSpeed(sqLiteDatabase));
                     }
 
                     @Override

@@ -1,6 +1,7 @@
 package com.griffith.assignment3;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.sql.Timestamp;
 
@@ -9,6 +10,7 @@ import java.sql.Timestamp;
  */
 
 public class CustomLocation {
+    private static String TAG = "CustomLocation";
     private Timestamp timestamp;
     private double latitude;
     private double longitude;
@@ -67,6 +69,11 @@ public class CustomLocation {
         float[] results = new float[1];
         Location.distanceBetween(this.latitude, this.longitude, location.getLatitude(), location.getLongitude(), results);
         return results[0];
+    }
+
+    public long getTimeBetween(CustomLocation location){
+        long diff = (timestamp.getTime() - location.getTimestamp().getTime()) / 1000; // divide by 1000 to get seconds instead of milliseconds
+        return diff < 0 ? diff * -1 : diff;
     }
 
     @Override
