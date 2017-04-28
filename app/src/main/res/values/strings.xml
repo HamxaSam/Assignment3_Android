@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">Assignment3</string>
+    <string name="app_name">GPS</string>
+    <string name="current_speed_txt">Current Speed (KM/H)</string>
+    <string name="total_distance_txt">Total Distance (KM)</string>
+    <string name="average_speed_txt">Average Speed (KM/H)</string>
+    <string name="total_time_txt">Total Time</string>
+    <string name="button_stop_txt">Stop</string>
+    <string name="button_start_txt">Start</string>
+    <string name="summary_activity">Summary</string>
 </resources>

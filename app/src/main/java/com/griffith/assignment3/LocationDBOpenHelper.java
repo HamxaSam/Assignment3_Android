@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 42900 on 14/04/2017 for Assignment3.
@@ -23,7 +24,8 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
             "moment TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
             "latitude DOUBLE, " +
             "longitude DOUBLE, " +
-            "distance FLOAT" +
+            "distance FLOAT, " +
+            "kmdone BOOLEAN" +
             ")";
     private static final String drop_table = "drop table " + TABLE;
 
@@ -49,6 +51,7 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
     }
 
     public void addLocation(SQLiteDatabase db, Location location){
+        float tmp_distance = total_distance;
         ContentValues cv = new ContentValues();
         cv.put("moment", System.currentTimeMillis());
         cv.put("latitude", location.getLatitude());
@@ -59,8 +62,13 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
             cv.put("distance", distance);
             total_distance += distance;
         }
+        if ((((int)total_distance % 1000 < (int)tmp_distance % 1000))) {
+            cv.put("kmdone", true);
+        } else {
+            cv.put("kmdone", false);
+        }
         db.insert(TABLE, null, cv);
-        Log.v(TAG, "Location added");
+        //Log.v(TAG, "Location added");
     }
 
     public CustomLocation getLastLocation(SQLiteDatabase db){
@@ -153,6 +161,20 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
         return speed;
     }
 
+    public ArrayList<CustomLocation> getAllCheckpoints(SQLiteDatabase db){
+        String[] wherearg = new String[]{ "true" };
+        Cursor cursor = db.query(false, TABLE, null, "kmdone = ?", wherearg , null, null, "id DESC", null);
+        ArrayList<CustomLocation> l = new ArrayList<>();
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            for (int i = 0; i < cursor.getCount(); i++){
+                l.add(new CustomLocation(new Timestamp(cursor.getLong(1)), cursor.getDouble(2), cursor.getDouble(3), cursor.getFloat(4)));
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return l;
+    }
 
     public float getTotal_distance() {
         return total_distance;
