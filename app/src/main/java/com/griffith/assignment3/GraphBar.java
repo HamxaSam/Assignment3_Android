@@ -62,9 +62,12 @@ public class GraphBar extends View {
             s.draw(canvas);
         }
         canvas.drawLine(width - graph_width, 0, width - graph_width, width, p);
-        for (Label l : verticals_labels){
-            canvas.drawText(l.getLabel(), 0, l.getCoord(), p);
-        }
+        if (this.values != null)
+            if (this.values.size() > 0) {
+                for (Label l : verticals_labels) {
+                    canvas.drawText(l.getLabel(), 0, l.getCoord(), p);
+                }
+            }
     }
 
     @Override
@@ -91,44 +94,59 @@ public class GraphBar extends View {
     }
 
     private void fillVerticalLabels(){
-        int diff = verticals_labels.get(1).getCoord() - verticals_labels.get(0).getCoord();
-        float[] minmax = findMinMaxValues();
-        float diffv = minmax[1] - minmax[0];
-        int step = diff / 8;
-        float stepv = diffv / 8;
-        for(int i  = 0; i < 7 ; ++i){
-            verticals_labels.add(new Label(String.valueOf(((i + 1) * stepv)+ minmax[0]), width - ((i + 1) * step)));
+        if (values.size() > 1 ) {
+            int diff = verticals_labels.get(1).getCoord() - verticals_labels.get(0).getCoord();
+            float[] minmax = findMinMaxValues();
+            float diffv = minmax[1] - minmax[0];
+            int step = diff / 8;
+            float stepv = diffv / 8;
+            for (int i = 0; i < 7; ++i) {
+                verticals_labels.add(new Label(String.valueOf(((i + 1) * stepv) + minmax[0]), width - ((i + 1) * step)));
+            }
         }
     }
 
     public void setValues(List<Float> values) {
         this.values = values;
-
-        float[] minmax = findMinMaxValues();
-        float diff = minmax[1] - minmax[0];
-        float ratio_min = 5 * diff / 100;
-
-
-        int w = graph_width / this.values.size();
-        for (int i = 0 ; i < this.values.size(); ++i) {
-            float ratio = (this.values.get(i) - minmax[0] + ratio_min) / diff;
-            int bar_heigth = (int)((graph_width) * ratio);
-            this.columns.add(new ShapeDrawable(new RectShape()));
-            if (i % 2 == 0)
-                this.columns.get(i).getPaint().setColor(Color.RED);
-            else
-                this.columns.get(i).getPaint().setColor(Color.BLUE);
-            this.columns.get(i).setBounds((width - graph_width) + w * i, width - bar_heigth , (width - graph_width) + w * (i + 1), width );
-            if (this.values.get(i) == minmax[0]){
-                //min
-                verticals_labels.add(new Label(String.valueOf(this.values.get(i)), width - bar_heigth));
-            } else if (this.values.get(i) == minmax[1]){
-                //max
+        if (values.size() == 0) {
+            invalidate();
+            return;
+        } else if (values.size() == 1){
+            int w = graph_width / this.values.size();
+            for (int i = 0 ; i < this.values.size(); ++i) {
+                int bar_heigth = (int)((graph_width) * 0.5f);
+                this.columns.add(new ShapeDrawable(new RectShape()));
+                this.columns.get(i).getPaint().setColor(getResources().getColor(R.color.colorSecondaryDark));
+                this.columns.get(i).setBounds((width - graph_width) + w * i, width - bar_heigth , (width - graph_width) + w * (i + 1), width );
                 verticals_labels.add(new Label(String.valueOf(this.values.get(i)), width - bar_heigth));
             }
+        } else {
+            float[] minmax = findMinMaxValues();
+            float diff = minmax[1] - minmax[0];
+            float ratio_min = 5 * diff / 100;
 
+            int w = graph_width / this.values.size();
+            for (int i = 0 ; i < this.values.size(); ++i) {
+                float ratio = (this.values.get(i) - minmax[0] + ratio_min) / diff;
+                int bar_heigth = (int)((graph_width) * ratio);
+                this.columns.add(new ShapeDrawable(new RectShape()));
+                if (i % 2 == 0)
+                    this.columns.get(i).getPaint().setColor(getResources().getColor(R.color.colorSecondaryDark));
+                else
+                    this.columns.get(i).getPaint().setColor(getResources().getColor(R.color.colorSecondary));
+                this.columns.get(i).setBounds((width - graph_width) + w * i, width - bar_heigth , (width - graph_width) + w * (i + 1), width );
+                Log.d("TAG", this.columns.get(i).getBounds().toString());
+                if (this.values.get(i) == minmax[0]){
+                    verticals_labels.add(new Label(String.valueOf(this.values.get(i)), width - bar_heigth));
+                } else if (this.values.get(i) == minmax[1]){
+                    verticals_labels.add(new Label(String.valueOf(this.values.get(i)), width - bar_heigth));
+                }
+
+            }
+            fillVerticalLabels();
         }
-        fillVerticalLabels();
+
+
         invalidate();
     }
 }

@@ -48,6 +48,7 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
     public void resetDB(SQLiteDatabase db){
         db.execSQL(drop_table);
         db.execSQL(create_table);
+        total_distance = 0.0f;
     }
 
     public void addLocation(SQLiteDatabase db, Location location){
@@ -62,7 +63,7 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
             cv.put("distance", distance);
             total_distance += distance;
         }
-        if ((((int)total_distance % 1000 < (int)tmp_distance % 1000))) {
+        if ((((int)total_distance % 1000 <= (int)tmp_distance % 1000))) {
             cv.put("kmdone", true);
         } else {
             cv.put("kmdone", false);
@@ -119,7 +120,7 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
         cursor.close();
         return l;
     }
-
+//    // debug
 //    public float getTotalDistance(SQLiteDatabase db){
 //        String[] columns = { "SUM(distance)" };
 //        Cursor cursor = db.query(false, TABLE, columns, null,  null, null, null, null, null);
@@ -162,7 +163,7 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<CustomLocation> getAllCheckpoints(SQLiteDatabase db){
-        String[] wherearg = new String[]{ "true" };
+        String[] wherearg = new String[]{ "1" };
         Cursor cursor = db.query(false, TABLE, null, "kmdone = ?", wherearg , null, null, "id DESC", null);
         ArrayList<CustomLocation> l = new ArrayList<>();
         if (cursor.getCount() > 0) {
@@ -174,6 +175,12 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return l;
+    }
+
+    public long getTotalTime(SQLiteDatabase db) {
+        CustomLocation first = getFirstLocation(db);
+        CustomLocation last = getLastLocation(db);
+        return first.getTimeBetween(last);
     }
 
     public float getTotal_distance() {

@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationDBOpenHelper locationDBOpenHelper;
     private SQLiteDatabase sqLiteDatabase;
 
-    private static final int REQUEST_LOCATION = 2;
+    private static final int REQUEST_LOCATION = 1;
 
     private TextView total_distance;
     private TextView current_speed;
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!started){
+                    locationDBOpenHelper.resetDB(sqLiteDatabase);
                     current_speed.setText(String.format("%.2f", 0.0f));
                     total_distance.setText(String.format("%.2f", 0.0f));
                     average_speed.setText(String.format("%.2f", 0.0f));
@@ -91,62 +93,74 @@ public class MainActivity extends AppCompatActivity {
                         locationListener = null;
                     }
                     Intent intent = new Intent(MainActivity.this, Summary.class);
+                    intent.putExtra("TOTALDISTANCE", String.format("%.2f", locationDBOpenHelper.getTotal_distance() / 1000));
+                    intent.putExtra("AVGSPEED", String.format("%.2f", locationDBOpenHelper.getAvgSpeed(sqLiteDatabase) * 3.6f));
+                    intent.putExtra("TOTALTIME", DateFormat.format("mm:ss", locationDBOpenHelper.getTotalTime(sqLiteDatabase) * 1000));
                     startActivity(intent);
                 }
             }
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    addLocationListener();
+                }
+            }
+        }
+    }
+
     private void addLocationListener() {
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+            return;
         }
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationListener = new
-                    LocationListener() {
-                        @Override
-                        public void onLocationChanged(Location location) {
-                            //Log.d("GPS", location.toString());
-                            locationDBOpenHelper.addLocation(sqLiteDatabase, location);
-                            current_speed.setText(String.format("%.2f", locationDBOpenHelper.getCurrentSpeed(sqLiteDatabase) * 3.6f));
-                            total_distance.setText(String.format("%.2f", locationDBOpenHelper.getTotal_distance() / 1000));
-                            average_speed.setText(String.format("%.2f", locationDBOpenHelper.getAvgSpeed(sqLiteDatabase) * 3.6f));
-                        }
+        locationListener = new
+                LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        //Log.d("GPS", location.toString());
+                        locationDBOpenHelper.addLocation(sqLiteDatabase, location);
+                        current_speed.setText(String.format("%.2f", locationDBOpenHelper.getCurrentSpeed(sqLiteDatabase) * 3.6f));
+                        total_distance.setText(String.format("%.2f", locationDBOpenHelper.getTotal_distance() / 1000));
+                        average_speed.setText(String.format("%.2f", locationDBOpenHelper.getAvgSpeed(sqLiteDatabase) * 3.6f));
+                    }
 
-                        @Override
-                        public void onProviderDisabled(String provider) {
+                    @Override
+                    public void onProviderDisabled(String provider) {
 //                            if (LocationManager.GPS_PROVIDER.equals(provider)) {
 //                                Log.d("OK", "BAD VALUES");
 //                            }
-                        }
+                    }
 
-                        @Override
-                        public void onProviderEnabled(String provider) {
-                            if (LocationManager.GPS_PROVIDER.equals(provider)) {
-                                try {
-                                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                        Log.d("PERMIT", "No permissions ?");
-                                        return;
-                                    }
-                                    Location l = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                                    if (l != null) {
-                                        Log.d("LAT", "????Latitude: " + l.getLatitude());
-                                        Log.d("LONG", "????Longitude: " + l.getLongitude());
-                                    }
-                                }catch (Exception e) {
-                                    Log.e("OULA", "ERROR", e);
+                    @Override
+                    public void onProviderEnabled(String provider) {
+                        if (LocationManager.GPS_PROVIDER.equals(provider)) {
+                            try {
+                                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    Log.d("PERMIT", "No permissions ?");
+                                    return;
                                 }
+                                Location l = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                                if (l != null) {
+                                    Log.d("LAT", "????Latitude: " + l.getLatitude());
+                                    Log.d("LONG", "????Longitude: " + l.getLongitude());
+                                }
+                            }catch (Exception e) {
+                                Log.e("OULA", "ERROR", e);
                             }
                         }
+                    }
 
-                        @Override
-                        public void onStatusChanged(String provider, int status, Bundle extras) {
-                        }
-                    };
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                    }
+                };
 
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 5.0f, locationListener);
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 5.0f, locationListener);
-
-        }
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 5.0f, locationListener);
+        lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 5.0f, locationListener);
     }
 }

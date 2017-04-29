@@ -4,12 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.griffith.assignment3.Summary">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/total_distance_txt"
+        android:textAllCaps="true"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/total_distance_sum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0.00"
+        android:textAlignment="textEnd"
+        android:layout_gravity="end"
+        android:gravity="end"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/total_time_txt"
+        android:textAllCaps="true"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/total_time_sum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="00:00:00"
+        android:textAlignment="textEnd"
+        android:layout_gravity="end"
+        android:gravity="end"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/average_speed_txt"
+        android:textAllCaps="true"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/average_speed_sum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="0.00"
+        android:textAlignment="textEnd"
+        android:layout_gravity="end"
+        android:gravity="end"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
 
     <com.griffith.assignment3.GraphBar
         android:id="@+id/graph_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="#ccc" />
+        android:background="#eee" />
 
 </LinearLayout>
