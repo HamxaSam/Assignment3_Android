@@ -106,20 +106,20 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
         cursor.close();
         return l;
     }
-    //for debug
-    public ArrayList<CustomLocation> getAllLocations(SQLiteDatabase db){
-        Cursor cursor = db.query(false, TABLE, null, null,  null, null, null, "id DESC", null);
-        ArrayList<CustomLocation> l = new ArrayList<>();
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            for (int i = 0; i < cursor.getCount(); i++){
-                l.add(new CustomLocation(new Timestamp(cursor.getLong(1)), cursor.getDouble(2), cursor.getDouble(3), cursor.getFloat(4)));
-                cursor.moveToNext();
-            }
-        }
-        cursor.close();
-        return l;
-    }
+//    //for debug
+//    public ArrayList<CustomLocation> getAllLocations(SQLiteDatabase db){
+//        Cursor cursor = db.query(false, TABLE, null, null,  null, null, null, "id DESC", null);
+//        ArrayList<CustomLocation> l = new ArrayList<>();
+//        if (cursor.getCount() > 0) {
+//            cursor.moveToFirst();
+//            for (int i = 0; i < cursor.getCount(); i++){
+//                l.add(new CustomLocation(new Timestamp(cursor.getLong(1)), cursor.getDouble(2), cursor.getDouble(3), cursor.getFloat(4)));
+//                cursor.moveToNext();
+//            }
+//        }
+//        cursor.close();
+//        return l;
+//    }
 //    // debug
 //    public float getTotalDistance(SQLiteDatabase db){
 //        String[] columns = { "SUM(distance)" };
@@ -187,7 +187,4 @@ public class LocationDBOpenHelper extends SQLiteOpenHelper {
         return total_distance;
     }
 
-    public void setTotal_distance(float total_distance) {
-        this.total_distance = total_distance;
-    }
 }

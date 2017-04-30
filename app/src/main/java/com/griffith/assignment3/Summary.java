@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Summary extends AppCompatActivity {
-    private LinkedList<Float> speed_list = new LinkedList<Float>();
+    private LinkedList<Float> time_list = new LinkedList<Float>();
     private GraphBar gb;
     private LocationDBOpenHelper locationDBOpenHelper;
     private SQLiteDatabase sqLiteDatabase;
@@ -34,7 +34,7 @@ public class Summary extends AppCompatActivity {
         ArrayList<CustomLocation> list = locationDBOpenHelper.getAllCheckpoints(sqLiteDatabase);
         for (int i = 0 ; i < list.size(); ++i) {
             if (i > 0){
-                speed_list.add((float)(list.get(i).getTimeBetween(list.get(i -1 ))));
+                time_list.add((float)(list.get(i).getTimeBetween(list.get(i -1 ))));
             }
         }
         gb = (GraphBar)findViewById(R.id.graph_bar);
@@ -65,7 +65,7 @@ public class Summary extends AppCompatActivity {
         gb.post(new Runnable() {
             @Override
             public void run() {
-                gb.setValues(speed_list);
+                gb.setValues(time_list);
             }
         });
     }

@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         chronometer = (Chronometer)findViewById(R.id.chronometer);
         button_start_stop = (Button)findViewById(R.id.button_stop_start);
 
-        locationDBOpenHelper.resetDB(sqLiteDatabase);
         lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         chronometer.stop();
 
@@ -141,16 +140,17 @@ public class MainActivity extends AppCompatActivity {
                         if (LocationManager.GPS_PROVIDER.equals(provider)) {
                             try {
                                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                    Log.d("PERMIT", "No permissions ?");
+                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
                                     return;
                                 }
                                 Location l = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                                 if (l != null) {
-                                    Log.d("LAT", "????Latitude: " + l.getLatitude());
-                                    Log.d("LONG", "????Longitude: " + l.getLongitude());
+                                    locationDBOpenHelper.addLocation(sqLiteDatabase, l);
+                                    current_speed.setText(String.format("%.2f", locationDBOpenHelper.getCurrentSpeed(sqLiteDatabase) * 3.6f));
+                                    total_distance.setText(String.format("%.2f", locationDBOpenHelper.getTotal_distance() / 1000));
+                                    average_speed.setText(String.format("%.2f", locationDBOpenHelper.getAvgSpeed(sqLiteDatabase) * 3.6f));
                                 }
                             }catch (Exception e) {
-                                Log.e("OULA", "ERROR", e);
                             }
                         }
                     }

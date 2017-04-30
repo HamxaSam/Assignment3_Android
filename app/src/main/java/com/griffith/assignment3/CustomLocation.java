@@ -16,10 +16,6 @@ public class CustomLocation {
     private double longitude;
     private float distance;
 
-    public CustomLocation(double latitude, double longitude) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
 
     public CustomLocation(Timestamp timestamp, double latitude, double longitude, float distance) {
         this.timestamp = timestamp;

@@ -108,6 +108,9 @@ public class GraphBar extends View {
 
     public void setValues(List<Float> values) {
         this.values = values;
+        if (this.values == null){
+            return;
+        }
         if (values.size() == 0) {
             invalidate();
             return;
@@ -135,13 +138,11 @@ public class GraphBar extends View {
                 else
                     this.columns.get(i).getPaint().setColor(getResources().getColor(R.color.colorSecondary));
                 this.columns.get(i).setBounds((width - graph_width) + w * i, width - bar_heigth , (width - graph_width) + w * (i + 1), width );
-                Log.d("TAG", this.columns.get(i).getBounds().toString());
                 if (this.values.get(i) == minmax[0]){
                     verticals_labels.add(new Label(String.valueOf(this.values.get(i)), width - bar_heigth));
                 } else if (this.values.get(i) == minmax[1]){
                     verticals_labels.add(new Label(String.valueOf(this.values.get(i)), width - bar_heigth));
                 }
-
             }
             fillVerticalLabels();
         }
